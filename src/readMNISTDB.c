@@ -124,15 +124,20 @@ int readTestFiles(struct dataset* test_samples)
 		int labelCounterF = 8;
 		int labelCounterD = 0;
       int imgCounter = -1;
-      for (counter = 16; counter < fSizeI; counter = counter + inputVectorSize)
+      for (counter = 16; counter < fSizeI; counter = counter + noCols * noRows)
       {
-         imgCounter = imgCounter + 1;              // 0, 1, 2,.., (fSizeI / inputVectorSize)
+         imgCounter = imgCounter + 1;              // 0, 1, 2,.., 9999
          int ctr = 0;
 			int bimgctr = counter;
-         for (ctr = 0; ctr < inputVectorSize; ctr++)
+
+         int skip = 66;       // Write begin from 66 = 32 * 2 + 2
+         for (ctr = 0; ctr < noCols * noRows; ctr++)
          {
-            test_samples->data[imgCounter * inputVectorSize + ctr] = (255.0 - bufferImages[bimgctr])/128.0 - 1.0;
+            test_samples->data[imgCounter * inputVectorSize + ctr + skip] = (bufferImages[bimgctr] - 255.0)/256.0 + 1.0;
 				bimgctr = bimgctr + 1;                 // 16
+
+            // Row's end of data image. 
+            if ((ctr + 1) % noCols == 0) skip += 4;
          }
 
 			int currlabel = bufferLables[labelCounterF];
@@ -143,8 +148,8 @@ int readTestFiles(struct dataset* test_samples)
             row = col = (int) sqrt(inputVectorSize);
             fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) \n", imgCounter, row, col);
             for (int i = 0; i < col; i ++) {
-               for (int j = 0; j < row; i++) {
-                  fprintf(stderr, "%.1lf ", test_samples->data[imgCounter * inputVectorSize + i * col + j]);
+               for (int j = 0; j < row; j++) {
+                  fprintf(stderr, "%2.1lf ", test_samples->data[imgCounter * inputVectorSize + i * col + j]);
                }
                fprintf(stderr, "\n");
             }
@@ -244,15 +249,20 @@ int readTrainingFiles(struct dataset* train_samples)
       int labelCounterF = 8;
       int labelCounterD = 0;
       int imgCounter = -1;
-      for (counter = 16; counter < fSizeI; counter = counter + inputVectorSize)
+      for (counter = 16; counter < fSizeI; counter = counter + noCols * noRows)
       {
          imgCounter = imgCounter + 1;
          int ctr = counter;
 			int bimgctr = counter;
-         for (ctr = 0; ctr < inputVectorSize; ctr++)
+
+         int skip = 66;    // write image from 66 = 32 * 2 + 2
+         for (ctr = 0; ctr < noCols * noRows; ctr++)
          {
-            train_samples->data[imgCounter * inputVectorSize + ctr] = (255.0 - bufferImages[bimgctr])/128.0 - 1.0;
+            train_samples->data[imgCounter * inputVectorSize + ctr + skip] = (bufferImages[bimgctr] - 255.0)/256.0 + 1.0;
 				bimgctr = bimgctr + 1;
+            
+            // Row's end of data image. 
+            if ((ctr + 1) % noCols == 0) skip += 4;
          }
 
 			int currlabel = bufferLables[labelCounterF];
@@ -261,12 +271,12 @@ int readTrainingFiles(struct dataset* train_samples)
          if (imgCounter % 10000 == 0) {
             int row, col;
             row = col = (int) sqrt(inputVectorSize);
-            fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) \n", imgCounter, row, col);
+            fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) - label %d \n", imgCounter, row, col, currlabel);
             for (int i = 0; i < col; i ++) {
-               for (int j = 0; j < row; i++) {
-                  fprintf(stderr, "%.1lf ", train_samples->data[imgCounter * inputVectorSize + i * col + j]);
-               }
                fprintf(stderr, "\n");
+               for (int j = 0; j < row; j++) {
+                  fprintf(stderr, "%2.1lf ", train_samples->data[imgCounter * inputVectorSize + i * col + j]);
+               }
             }
          }
 

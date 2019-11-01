@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
 	cnn_t*  cnn_specs = (cnn_t *) malloc(sizeof(cnn_t));
 	cnn_specs->nlayers = 8;
-	cnn_specs->layer_type = 2;      //sigmoid = 1 tanh = 2 reLU = 3
+	cnn_specs->layer_type = 3;      //sigmoid = 1 tanh = 2 reLU = 3
 	cnn_specs->pool_type = 2;    //avg = 1 max = 2 stochastic pooling = 3
 
 	cnn_specs->no_fmaps = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
