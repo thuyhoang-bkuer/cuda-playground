@@ -22,8 +22,8 @@ VER_MIN=0
 BUILDDIR_A=../lib
 BUILDDIR_SO=../lib
 BUILDDIR_BIN=../bin
-OBJDIR=../obj
-SRCDIR=./src/
+OBJDIR=./obj
+SRCDIR=./src
 SRCDIR_HDRS=./inc
 SRCDIR_CUDA=$(SRCDIR)
 
