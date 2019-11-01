@@ -509,6 +509,7 @@ real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, uns
 	int counter = 0;	
 	for (counter = 0; counter < BATCH_SIZE; counter++)
 	{
+		// layer_type = 1 -> sigmoid, 2 -> tanh, 3 -> relu
 		if (current->layer_type == 1 || current->layer_type == 3)
 		{
 			int doCtr = 0;
@@ -555,13 +556,13 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 
 	while (epoch_counter < max_epoch)
 	{
-        int nMcr = 1;
+    int nMcr = 1;
 		int nvecs = train_samples->numVectors;
 		int batch_count = nvecs/BATCH_SIZE;
 
 		mini_batching(batch_indexes, nvecs, false); 
 
-		real_t avg_mse = 0;
+				real_t avg_mse = 0;
         int nouts = train_samples->lenlable;			
 
         if (gpu_turn != 0)
@@ -582,8 +583,9 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             
                 if (bctr % 1000 == 0)
                     fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter, max_epoch);
-            }
-
+						}
+						
+						avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
         }
         else 
@@ -622,21 +624,21 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
             printf("\n =========================");
             printf("\n EpochCounter\t\tTEST SET");
-            printf("\n\n%d\t\t%f", epoch_counter, mcr_test_set);
+            printf("\n\n%6d\t\t\t%4.3f", epoch_counter, mcr_test_set);
             printf("\n");
 
             d_reset_output_vectors(headlayer);
 
             if (mcr_test_set < min_mcr)
             {
-								fprintf(stderr,"Writing weight..");
+								// fprintf(stderr,"Writing weight..");
                 char fn[4];
                 char fname[13] = "Checkpoint-";
                 sprintf (fn, "%d", epoch_counter);
                 strcat(fname, fn);
                 save_trained_network_weights(headlayer, fname);
 								min_mcr = mcr_test_set;
-								fprintf(stderr,"\t\tWriting done!\n\n");
+								fprintf(stderr,"\t\tWriting weights done!\n\n");
             }
         }
         else if (gpu_turn == 0 && epoch_counter % nMcr == 0)
@@ -1392,7 +1394,7 @@ void reset_inputs_dweights_deltas(cnnlayer_t* headlayer)
 
 real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *samples)
 {
-    fprintf(stderr, "\n computing MCR, No. of samples: %d\n, Progress: ", samples->numVectors);
+  fprintf(stderr, "\n computing MCR, No. of samples: %d\n, Progress: ", samples->numVectors);
 	int mcr = 0;
 	int datactr = 0;
 	for (datactr = 0; datactr < samples->numVectors; datactr++)
@@ -1457,7 +1459,7 @@ real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *sampl
  
 						real_t* filter = NULL;
 
-                        filter = &(current->weights_matrix[st_idx]); 
+            filter = &(current->weights_matrix[st_idx]); 
 
 						int fmap_stidx = sctr * imh * imw;
 
@@ -1478,18 +1480,19 @@ real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *sampl
 								{
 									int cidx = fmap_stidx + hctr * imw + wctr;
 									real_t sum = 0.0;
-                                    int filterCtr = 0, convCtr1 = 0, convCtr2 = 0;
-                                    for (convCtr1 = -1 * floor(current->fkernel/2); convCtr1 <= floor(current->fkernel/2); convCtr1++) 
-                                    {
-                                        for (convCtr2 = -1 * floor(current->fkernel/2); convCtr2 <= floor(current->fkernel/2); convCtr2++)
-                                        {
-                                            sum = sum + filter[filterCtr] * current->neurons_output[cidx + convCtr1 * imw + convCtr2];
-                                            filterCtr++;
-                                        }
-                                    }
-									 //save summation to destination feature map
-									 int dst_idx = dst_fmap_stidx + dst_fmap_ctr; 
-									 next_to_current->neurons_input[dst_idx] += sum; 
+									int filterCtr = 0, convCtr1 = 0, convCtr2 = 0;
+									for (convCtr1 = -1 * floor(current->fkernel/2); convCtr1 <= floor(current->fkernel/2); convCtr1++) 
+									{
+											for (convCtr2 = -1 * floor(current->fkernel/2); convCtr2 <= floor(current->fkernel/2); convCtr2++)
+											{
+													sum = sum + filter[filterCtr] * current->neurons_output[cidx + convCtr1 * imw + convCtr2];
+													filterCtr++;
+											}
+									}
+																		
+									//save summation to destination feature map
+									int dst_idx = dst_fmap_stidx + dst_fmap_ctr; 
+									next_to_current->neurons_input[dst_idx] += sum; 
 									
 									//applying transfer function
 									if (sctr == src_fmaps - 1)
@@ -1652,7 +1655,7 @@ real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *sampl
 
 real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples)
 {
-    int d_mcr = 0;
+  int d_mcr = 0;
 	int sampleCtr = 0;
 	for (sampleCtr = 0; sampleCtr < samples->numVectors; sampleCtr++)
 	{
