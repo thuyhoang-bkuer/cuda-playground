@@ -58,6 +58,7 @@ extern "C"
 {
 #endif
 	cnnlayer_t* create_cnn(cnn_t* cnn_specs);
+	void getDetail(struct nnlayer *headlayer);
 	int initialize_weights_matrices(struct nnlayer *headlayer, bool_t generate_random);
 	int initialize_qweights(struct nnlayer *headlayer);
 	int reset_parameters_to_high_precision(cnnlayer_t* headlayer);

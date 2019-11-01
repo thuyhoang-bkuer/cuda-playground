@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
 	cnn_specs->fkernel[7] = 1;
 
 	cnnlayer_t* headlayer = create_cnn(cnn_specs);
+	getDetail(headlayer);
+
 	initialize_weights_matrices(headlayer, true);
     	//display_weights_matrices(headlayer);
 	save_trained_network_weights(headlayer, "big_nw_init");
