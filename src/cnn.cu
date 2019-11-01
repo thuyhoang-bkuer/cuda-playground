@@ -621,21 +621,22 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             real_t mcr_test_set = 0;
             mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
             printf("\n =========================");
-            printf("\n EpochCounter     TEST SET");
-            printf("\n\n   %d              %f   ", epoch_counter, mcr_test_set);
-            fprintf(stderr,"\n\n   %d              %f   ", epoch_counter, mcr_test_set);
+            printf("\n EpochCounter\t\tTEST SET");
+            printf("\n\n%d\t\t%f", epoch_counter, mcr_test_set);
             printf("\n");
 
             d_reset_output_vectors(headlayer);
 
             if (mcr_test_set < min_mcr)
             {
+								fprintf(stderr,"Writing weight..");
                 char fn[4];
-                char fname[13] = "WEIGHTS/";
+                char fname[13] = "Checkpoint-";
                 sprintf (fn, "%d", epoch_counter);
                 strcat(fname, fn);
                 save_trained_network_weights(headlayer, fname);
-                min_mcr = mcr_test_set;
+								min_mcr = mcr_test_set;
+								fprintf(stderr,"\t\tWriting done!\n\n");
             }
         }
         else if (gpu_turn == 0 && epoch_counter % nMcr == 0)
