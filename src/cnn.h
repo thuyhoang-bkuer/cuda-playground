@@ -6,6 +6,7 @@
 #include "dataset.h"
 #define MOMENTUM 	0.9
 #define MSE_LIMIT 	0.000001
+#define MAX_EPOCH 5
 
 #ifdef __cplusplus
 extern "C"

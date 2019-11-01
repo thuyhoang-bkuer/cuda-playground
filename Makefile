@@ -43,13 +43,13 @@ endif
 ifeq ($(FLAG_DNN_CUDA),1) 
   INCDIR+=$(CUDA_PATH)/include
   LIBDIR+=$(CUDA_PATH)/lib64
-  LIBS+=-lcublas -lcuda -lcudart -lcurand
+  LIBS+=-lcublas -lcuda -lcudart -lcurand -lstdc++
   DEFS+=-D__DNN_CUDA
   LDFLAGS+=-Wl,-rpath $(CUDA_PATH)/lib64
   NVCC=/usr/local/cuda/bin/nvcc
   OBJDIR_CUDA=$(OBJDIR)/cuda
   OBJS=$(patsubst $(SRCDIR_CUDA)/%.cu,$(OBJDIR_CUDA)/%.o, $(wildcard $(SRCDIR_CUDA)/*.cu))
-  NVCCFLAGS=-Xcompiler -fPIC -arch=sm_30
+  NVCCFLAGS=-Xcompiler -fPIC -arch=sm_30 
 endif
 
 INCDIR+=$(SRCDIR_HDRS)

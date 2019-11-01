@@ -51,8 +51,8 @@ int readMNISTDB(struct dataset* train_samples, struct dataset* test_samples)
 
 int readTestFiles(struct dataset* test_samples)
 {
-	char *filenameTestImages = "../MNIST/t10k-images-idx3-ubyte"; //32 by 32
-	char *filenameTestLables = "../MNIST/t10k-labels-idx1-ubyte";
+	char *filenameTestImages = "./MNIST/t10k-images-idx3-ubyte"; //32 by 32
+	char *filenameTestLables = "./MNIST/t10k-labels-idx1-ubyte";
 
 	FILE *fpTestImages = NULL;
 	FILE *fpTestLables = NULL;
@@ -159,8 +159,8 @@ int readTestFiles(struct dataset* test_samples)
 
 int readTrainingFiles(struct dataset* train_samples)
 {
-   char *filenameTrainImages = "../MNIST/train-images-idx3-ubyte";
-   char *filenameTrainLables = "../MNIST/train-label-idx1-ubyte";
+   char *filenameTrainImages = "./MNIST/train-images-idx3-ubyte";
+   char *filenameTrainLables = "./MNIST/train-labels-idx1-ubyte";
 
    FILE *fpTrainImages = NULL;
    FILE *fpTrainLables = NULL;

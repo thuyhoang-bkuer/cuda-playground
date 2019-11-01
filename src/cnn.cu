@@ -546,7 +546,7 @@ real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, uns
 void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_samples)
 {
 	int epoch_counter = 0;
-	int max_epoch = 150;
+	int max_epoch = MAX_EPOCH;
 	int *batch_indexes = (int *) malloc(sizeof(int) * train_samples->numVectors);
 	real_t min_mcr = 25.0;
 
