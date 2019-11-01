@@ -26,6 +26,7 @@
 #include "time.h"
 #include "readMNISTDB.h"
 #include "dataset.h"
+#include "math.h"
 
 int inputVectorSize = 1024;
 
@@ -125,17 +126,29 @@ int readTestFiles(struct dataset* test_samples)
       int imgCounter = -1;
       for (counter = 16; counter < fSizeI; counter = counter + inputVectorSize)
       {
-         imgCounter = imgCounter + 1;
+         imgCounter = imgCounter + 1;              // 0, 1, 2,.., (fSizeI / inputVectorSize)
          int ctr = 0;
 			int bimgctr = counter;
          for (ctr = 0; ctr < inputVectorSize; ctr++)
          {
             test_samples->data[imgCounter * inputVectorSize + ctr] = (255.0 - bufferImages[bimgctr])/128.0 - 1.0;
-				bimgctr = bimgctr + 1;
+				bimgctr = bimgctr + 1;                 // 16
          }
 
 			int currlabel = bufferLables[labelCounterF];
          test_samples->lables[labelCounterD] = currlabel;
+
+         if (imgCounter % 10000 == 0) {
+            int row, col;
+            row = col = (int) sqrt(inputVectorSize);
+            fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) \n", imgCounter, row, col);
+            for (int i = 0; i < col; i ++) {
+               for (int j = 0; j < row; i++) {
+                  fprintf(stderr, "%.1lf ", test_samples->data[imgCounter * inputVectorSize + i * col + j]);
+               }
+               fprintf(stderr, "\n");
+            }
+         }
 
 #ifdef __freadDebug
          fprintf(stderr, "\n labelcounter(d,f): %d, %d, Train60kLables: %d", labelCounterD, labelCounterF, Test10kLables[labelCounterD]);
@@ -244,6 +257,18 @@ int readTrainingFiles(struct dataset* train_samples)
 
 			int currlabel = bufferLables[labelCounterF];
 			train_samples->lables[labelCounterD] = currlabel;
+
+         if (imgCounter % 10000 == 0) {
+            int row, col;
+            row = col = (int) sqrt(inputVectorSize);
+            fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) \n", imgCounter, row, col);
+            for (int i = 0; i < col; i ++) {
+               for (int j = 0; j < row; i++) {
+                  fprintf(stderr, "%.1lf ", train_samples->data[imgCounter * inputVectorSize + i * col + j]);
+               }
+               fprintf(stderr, "\n");
+            }
+         }
 
 #ifdef __freadDebug
 			fprintf(stderr, "\n labelcounter(d,f): %d, %d, Train60kLables: %d", labelCounterD, labelCounterF, Train60kLables[labelCounterD]);

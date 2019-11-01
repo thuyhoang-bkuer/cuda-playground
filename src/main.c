@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 	cnnlayer_t* headlayer = create_cnn(cnn_specs);
 	initialize_weights_matrices(headlayer, true);
     	//display_weights_matrices(headlayer);
+	save_trained_network_weights(headlayer, "big_nw_init");
 
 	dataset_t* train_samples = NULL;
 	dataset_t* test_samples = NULL;
@@ -95,23 +96,23 @@ int main(int argc, char *argv[])
 	/* Debugging networks */
 	//display_cnn_layers(headlayer);
 	
-	#if 0
+	#if 1
 	double mcr = 0;	
 	printf("\n Computing Missclassification Rate on Test Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Test Set");
-	mcr = compute_missclassification_rate(headlayer, test_samples, false, false);	
+	mcr = d_compute_missclassification_rate(headlayer, test_samples);	
 	printf("\n missclassification rate is : %6.3f\n", mcr);
 	fprintf(stderr,"\n missclassification rate is : %6.3f\n", mcr);
 
 	printf("\n Computing Missclassification Rate on Training Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Training Set");
-	mcr = compute_missclassification_rate(headlayer, train_samples);	
+	mcr = d_compute_missclassification_rate(headlayer, train_samples);	
 	fprintf(stderr,"\n missclassification rate on training is : %6.3f\n", mcr);
 	printf("\n missclassification rate on training is : %6.3f\n", mcr);
 	#endif
 
 	/* save network parameters (weights and biases) */
-	save_trained_network_weights(headlayer, "big_nw_init");
+	save_trained_network_weights(headlayer, "big_nw_finally");
 	
 	/* Release dynamically allocated memory */
 	destroy_cnn(headlayer);
