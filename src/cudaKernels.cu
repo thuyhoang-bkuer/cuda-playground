@@ -12,6 +12,8 @@ __global__ void compute_transfer_function(real_t* d_output, real_t* d_biases, in
         d_output[dstIdx] = (1.7159 * tanh(0.66666 * netInput));
     else if (layer_type == 3)
         d_output[dstIdx] = ((netInput >= 0) ? netInput : 0); 
+    else:
+        d_output[dstIdx] = netInput;
 }
 
 __global__ void convolve_device_2D(real_t* d_output, real_t* d_input, real_t* d_kernel, int kerSize)
@@ -488,6 +490,10 @@ __global__ void d_update_error_deltas(real_t* d_output, real_t* d_cerr_deltas, i
         else dy = 0;
 
         d_cerr_deltas[cThreadIdx] = cedelta * dy; 
+    }
+    else {
+        real_t dy = 1;
+        d_cerr_deltas[cThreadIdx] = cedelta * dy;
     }
 }
 

@@ -57,7 +57,7 @@ int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_inde
 
 			if (next_to_current->subsampling == false && current->fkernel != 1)
 			{
-				//convfmapolution layers
+								//convolution layers
                 //int kerSize = src_fmaps * dst_fmaps * fkernel * fkernel;
                 //int kerBytes = kerSize * sizeof(real_t);
                 //HANDLE_ERROR(cudaMemcpy(current->d_weights, current->weights_matrix, kerBytes, cudaMemcpyHostToDevice));
@@ -1312,19 +1312,19 @@ void d_reset_output_vectors(cnnlayer_t* headlayer)
 		if (next_to_current->next == NULL)
 			flag = false;	
 
-        int noSize = current->no_of_neurons * sizeof(real_t);    
-        HANDLE_ERROR(cudaMemset(current->d_neurons_output, 0, noSize));
+			int noSize = current->no_of_neurons * sizeof(real_t);    
+			HANDLE_ERROR(cudaMemset(current->d_neurons_output, 0, noSize));
 
 		if (flag == true)
 		{
 			current = next_to_current;
 			next_to_current = current->next;
 		}
-        else
-        {
-            int noSize = next_to_current->no_of_neurons * sizeof(real_t);    
-            HANDLE_ERROR(cudaMemset(next_to_current->d_neurons_output, 0, noSize));
-        }
+		else
+		{
+				int noSize = next_to_current->no_of_neurons * sizeof(real_t);    
+				HANDLE_ERROR(cudaMemset(next_to_current->d_neurons_output, 0, noSize));
+		}
 	}
 }
 
@@ -1662,8 +1662,8 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 		cnnlayer_t* current = headlayer;
 		cnnlayer_t* next_to_current = current->next;
 
-        //This is needed as neurons_output accumulates input (+=)
-        d_reset_output_vectors(headlayer);
+		//This is needed as neurons_output accumulates input (+=)
+		d_reset_output_vectors(headlayer);
 
 		int inp_vec_size = current->no_of_neurons;
 		int desired_label = samples->lables[sampleCtr];
@@ -1754,10 +1754,10 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 				next_to_current = current->next;
 			}
 
-            if (flag == false)
-            {
-                int noutSize = next_to_current->no_of_neurons * sizeof(real_t);
-                HANDLE_ERROR(cudaMemcpy(next_to_current->neurons_output, next_to_current->d_neurons_output, noutSize, cudaMemcpyDeviceToHost));
+			if (flag == false)
+			{
+					int noutSize = next_to_current->no_of_neurons * sizeof(real_t);
+					HANDLE_ERROR(cudaMemcpy(next_to_current->neurons_output, next_to_current->d_neurons_output, noutSize, cudaMemcpyDeviceToHost));
 
 				int mctr = 0;
 				real_t max = next_to_current->neurons_output[0];

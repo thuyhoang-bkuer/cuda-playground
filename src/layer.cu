@@ -45,7 +45,7 @@ cnnlayer_t* create_cnn(cnn_t* cnn_specs)
 		current->no_of_neurons = cnn_specs->fmap_size[counter] * cnn_specs->no_fmaps[counter];
 		current->fkernel = cnn_specs->fkernel[counter];
 
-		current->layer_type = cnn_specs->act_maps[counter];
+		current->layer_type = 3;
 		current->pool_type = cnn_specs->pool_type;
 
 		current->fmap_height = sqrt(cnn_specs->fmap_size[counter]);
@@ -129,12 +129,12 @@ cnnlayer_t* create_cnn(cnn_t* cnn_specs)
 void getDetail(cnnlayer_t* headlayer) 
 {
 	if (headlayer == NULL) return;
-
-	fprintf(stdio, "\nNo. Feature Map: \t\t %d\n.", headlayer->no_of_fmaps);
-	fprintf(stdio, "\nNo. Feature Size: \t\t %d x %d\n.", headlayer->fmap_width, headlayer->fmap_height);
-	fprintf(stdio, "\nNo. Kernel Size: \t\t %d\n.", headlayer->fkernel);
-	fprintf(stdio, "\nNo. Subsample: \t\t %s\n.", headlayer->subsampling ? "Yes" : "No");
-	fprintf(stdio, "\nNo. Activation: \t\t %s\n.", headlayer->layer_type == 1 ? "Sigmoid" : (headlayer->layer_type == 2 ? "Tanh" : (headlayer->layer_type == 0 ? "None" : "ReLU")));
+	fprintf(stderr, "\n ============= %s ==============\n", "");
+	fprintf(stderr, "No. Feature Map: \t\t %d.\n", headlayer->no_of_fmaps);
+	fprintf(stderr, "No. Feature Size: \t\t %d x %d.\n", headlayer->fmap_width, headlayer->fmap_height);
+	fprintf(stderr, "No. Kernel Size: \t\t %d.\n", headlayer->fkernel);
+	fprintf(stderr, "No. Subsample: \t\t %s.\n", headlayer->subsampling ? "Yes" : "No");
+	fprintf(stderr, "No. Activation: \t\t %s.\n\n\n", headlayer->layer_type == 1 ? "Sigmoid" : (headlayer->layer_type == 2 ? "Tanh" : (headlayer->layer_type == 0 ? "None" : "ReLU")));
 	
 	getDetail(headlayer->next);
 }
