@@ -36,31 +36,50 @@ int main(int argc, char *argv[])
 
 	srand(seed);
 
+
+	 /*
+	 *	Architecture
+	 * 								(relu)					(relu)							(relu)						(relu)							(tanh)					(tanh)			(sigmoid)
+	 * 	Input ------> Conv1 ------> Subsampling2 -------> Conv3 -------> Subsampling4 -------> Flatten --------> FC ------> Output 
+	*/
+
 	cnn_t*  cnn_specs = (cnn_t *) malloc(sizeof(cnn_t));
 	cnn_specs->nlayers = 8;
-	cnn_specs->layer_type = 3;      //sigmoid = 1 tanh = 2 reLU = 3
 	cnn_specs->pool_type = 2;    //avg = 1 max = 2 stochastic pooling = 3
 
+
+	/*	Activation Type
+	 * 	1 - sigmoid
+	 * 	2 - tanh
+	 * 	3 - relu
+	*/
+	cnn_specs->act_maps = (int *) calloc(cnn_specs->nlayers, sizeof(int));
+	cnn_specs->act_maps[2] = 3;		// relu
+	cnn_specs->act_maps[4] = 3;		// relu
+	cnn_specs->act_maps[5] = 2;		// relu
+	cnn_specs->act_maps[6] = 2;		// relu
+	cnn_specs->act_maps[7] = 1;		// relu
+
 	cnn_specs->no_fmaps = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
-	cnn_specs->no_fmaps[0] = 1;		//input
-	cnn_specs->no_fmaps[1] = 16;		//C1
-	cnn_specs->no_fmaps[2] = 16;		//S2
-	cnn_specs->no_fmaps[3] = 24;   //C3
-	cnn_specs->no_fmaps[4] = 24; 	//S4
-	cnn_specs->no_fmaps[5] = 48;  //C5=>ffN
+	cnn_specs->no_fmaps[0] = 1;			//input
+	cnn_specs->no_fmaps[1] = 16;		//Conv-ReLU 1
+	cnn_specs->no_fmaps[2] = 16;		//Subsample 2
+	cnn_specs->no_fmaps[3] = 24;   	//Conv-ReLU 3
+	cnn_specs->no_fmaps[4] = 24; 		//Subsample 4
+	cnn_specs->no_fmaps[5] = 48;  	//Flatten
 	cnn_specs->no_fmaps[6] = 128; 	//
-	cnn_specs->no_fmaps[7] = 10; 	//final
+	cnn_specs->no_fmaps[7] = 10; 		//final
 
 	cnn_specs->fmap_size = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
 
-	cnn_specs->fmap_size[0] = 1024;	
-	cnn_specs->fmap_size[1] = 784;	
-	cnn_specs->fmap_size[2] = 196; 	
-	cnn_specs->fmap_size[3] = 100; 	
-	cnn_specs->fmap_size[4] = 25; 	
-	cnn_specs->fmap_size[5] = 1; 	
-	cnn_specs->fmap_size[6] = 1; 	
-	cnn_specs->fmap_size[7] = 1; 	
+	cnn_specs->fmap_size[0] = 1024;	//32 x 32 x 1
+	cnn_specs->fmap_size[1] = 784;	//28 x 28 x 16
+	cnn_specs->fmap_size[2] = 196; 	//14 x 14 x 16
+	cnn_specs->fmap_size[3] = 100; 	//10 x 10 x 24
+	cnn_specs->fmap_size[4] = 25; 	// 5 x  5 x 24
+	cnn_specs->fmap_size[5] = 1; 	 	// 1 x  1 x 48
+	cnn_specs->fmap_size[6] = 1; 		// 1 x  1 x 128
+	cnn_specs->fmap_size[7] = 1; 		// 1 x  1 x 10
 
 	cnn_specs->fkernel = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
 	cnn_specs->fkernel[0] = 5;

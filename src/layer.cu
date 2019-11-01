@@ -45,7 +45,7 @@ cnnlayer_t* create_cnn(cnn_t* cnn_specs)
 		current->no_of_neurons = cnn_specs->fmap_size[counter] * cnn_specs->no_fmaps[counter];
 		current->fkernel = cnn_specs->fkernel[counter];
 
-		current->layer_type = cnn_specs->layer_type;
+		current->layer_type = cnn_specs->act_maps[counter];
 		current->pool_type = cnn_specs->pool_type;
 
 		current->fmap_height = sqrt(cnn_specs->fmap_size[counter]);

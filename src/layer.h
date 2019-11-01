@@ -9,9 +9,9 @@ typedef int     bool_t;
 struct cnn
 {
 	int nlayers;
-	int layer_type;
 	int pool_type;
 
+	int*		act_maps;
 	int*    fmap_size;
 	int*    no_fmaps; 
 	int*    fkernel; 
