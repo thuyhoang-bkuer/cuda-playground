@@ -12,7 +12,7 @@ __global__ void compute_transfer_function(real_t* d_output, real_t* d_biases, in
         d_output[dstIdx] = (1.7159 * tanh(0.66666 * netInput));
     else if (layer_type == 3)
         d_output[dstIdx] = ((netInput >= 0) ? netInput : 0); 
-    else:
+    else
         d_output[dstIdx] = netInput;
 }
 

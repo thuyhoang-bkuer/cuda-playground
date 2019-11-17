@@ -510,7 +510,7 @@ real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, uns
 	for (counter = 0; counter < BATCH_SIZE; counter++)
 	{
 		// layer_type = 1 -> sigmoid, 2 -> tanh, 3 -> relu
-		if (current->layer_type == 1 || current->layer_type == 3)
+		if (current->layer_type == 1 || current->layer_type == 3 || current->layer_type == 0)
 		{
 			int doCtr = 0;
 			for (doCtr = 0; doCtr < nouts; doCtr++)
@@ -581,11 +581,15 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 float time_citer = timer.Elapsed();
                 elapsed += time_citer;
             
-                if (bctr % 1000 == 0)
-                    fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter, max_epoch);
+                if (bctr % 1000 == 0) {
+										fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter, max_epoch);
+										
+										avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
+										fprintf(stderr,"\n Avg MSE: %f", avg_mse);
+								}
 						}
 						
-						avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
+						// avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
         }
         else 
@@ -606,7 +610,8 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 elapsed += time_citer;
 
                 if (bctr % 100 == 0)
-                    fprintf(stderr,"\nbctr/batch_count: %d/%d/%d", bctr, batch_count, max_epoch);
+										fprintf(stderr,"\nbctr/batch_count: %d/%d/%d", bctr, batch_count, max_epoch);
+										
             }
 
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
