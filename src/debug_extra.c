@@ -271,7 +271,7 @@ void display_dataVector(struct dataset* dataVector)
 // }
 
 
-void display__layer(cnnlayer_t * current) {
+void display_layer(cnnlayer_t * current) {
     fprintf(stderr, "\nCurrent Input: \n");
     
     int no_of_neurons = current->no_of_neurons;

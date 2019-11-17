@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 
 	printf("\n Computing Missclassification Rate on Training Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Training Set");
-	mcr = d_compute_missclassification_rate(headlayer, train_samples);	
+	mcr = d_compute_missclassification_rate(headlayer, train_samples, 0);	
 	fprintf(stderr,"\n missclassification rate on training is : %6.3f\n", mcr);
 	// printf("\n missclassification rate on training is : %6.3f\n", mcr);
 	#endif

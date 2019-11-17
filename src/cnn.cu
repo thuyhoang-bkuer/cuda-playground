@@ -567,7 +567,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 	copy_hweights_to_dweights(headlayer);
 	
 	real_t mcr_test_set = 0;
-	mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
+	mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples, 0);
 	printf("\n ===== BEFORE TRAINING ====");
 	printf("\n EpochCounter\t\tTEST SET");
 	printf("\n\n%6d\t\t\t%4.3f", epoch_counter, mcr_test_set);
@@ -649,7 +649,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             //display_weights_matrices(headlayer);
 
             real_t mcr_test_set = 0;
-            mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
+            mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples, 0);
             printf("\n =========================");
             printf("\n EpochCounter\t\tTEST SET");
             printf("\n\n%6d\t\t\t%4.3f", epoch_counter, mcr_test_set);
