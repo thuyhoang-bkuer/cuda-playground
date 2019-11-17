@@ -21,6 +21,8 @@ extern "C"
 
     void display_gradientMap(cnnlayer_t* headlayer);
 
+    void display_layer(cnnlayer_t* current);
+
 #ifdef __cplusplus
 }
 #endif

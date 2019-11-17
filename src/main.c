@@ -121,15 +121,15 @@ int main(int argc, char *argv[])
 	double mcr = 0;	
 	printf("\n Computing Missclassification Rate on Test Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Test Set");
-	mcr = d_compute_missclassification_rate(headlayer, test_samples);	
-	printf("\n missclassification rate is : %6.3f\n", mcr);
+	mcr = d_compute_missclassification_rate(headlayer, test_samples, 3);	
+	// printf("\n missclassification rate is : %6.3f\n", mcr);
 	fprintf(stderr,"\n missclassification rate is : %6.3f\n", mcr);
 
 	printf("\n Computing Missclassification Rate on Training Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Training Set");
 	mcr = d_compute_missclassification_rate(headlayer, train_samples);	
 	fprintf(stderr,"\n missclassification rate on training is : %6.3f\n", mcr);
-	printf("\n missclassification rate on training is : %6.3f\n", mcr);
+	// printf("\n missclassification rate on training is : %6.3f\n", mcr);
 	#endif
 
 	/* save network parameters (weights and biases) */

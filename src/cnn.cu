@@ -80,6 +80,7 @@ int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_inde
 			}
 			else if (next_to_current->subsampling == false && current->fkernel == 1)
 			{
+				// fully-connected layer
 			   	int src_layer_size = current->no_of_neurons;
 				int dst_layer_size = next_to_current->no_of_neurons;
 
@@ -534,6 +535,17 @@ real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, uns
 			mse = mse + (error * error); 
 		}
 
+		// Print output
+		// fprintf(stderr, "\n------- MSE (%d) ------\n", cl);
+	
+		// fprintf(stderr, "[ ");
+		// for (int i = 0; i < nouts; i++) {
+		// 	if (i == cl) fprintf(stderr, "*");
+		// 	fprintf(stderr, "%.5f ", current->neurons_output[counter * nouts + i]);
+		// }
+		// fprintf(stderr, "]\n");
+
+
 		mse = mse/nouts;
 		avg_mse = avg_mse + mse;
 	}
@@ -552,7 +564,15 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 	real_t min_mcr = 25.0;
 
     bool_t gpu_turn = 1;
-    copy_hweights_to_dweights(headlayer);
+	copy_hweights_to_dweights(headlayer);
+	
+	real_t mcr_test_set = 0;
+	mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
+	printf("\n ===== BEFORE TRAINING ====");
+	printf("\n EpochCounter\t\tTEST SET");
+	printf("\n\n%6d\t\t\t%4.3f", epoch_counter, mcr_test_set);
+	printf("\n");
+
 
 	while (epoch_counter < max_epoch)
 	{
@@ -563,7 +583,9 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 		mini_batching(batch_indexes, nvecs, false); 
 
 		real_t avg_mse = 0;
-        int nouts = train_samples->lenlable;			
+		int nouts = train_samples->lenlable;
+		
+		
 
         if (gpu_turn != 0)
         {
@@ -579,17 +601,18 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 d_reset_vectors(headlayer);
                 timer.Stop();
                 float time_citer = timer.Elapsed();
-                elapsed += time_citer;
+				elapsed += time_citer;
+				
+				avg_mse += compute_mse(headlayer, nouts, &batch_indexes[bctr * BATCH_SIZE], train_samples->lables);
             
                 if (bctr % 1000 == 0) {
-					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter, max_epoch);
+					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter + 1, max_epoch);
 					
-					avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
-					fprintf(stderr,"\n Avg MSE: %f", avg_mse);
+
 				}
 			}
 						
-			avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
+			
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
         }
         else 
@@ -636,7 +659,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 
             if (mcr_test_set < min_mcr)
             {
-								// fprintf(stderr,"Writing weight..");
+				fprintf(stderr,"Writing weight..");
                 char fn[4];
                 char fname[13] = "Checkpoint-";
                 sprintf (fn, "%d", epoch_counter);
@@ -1658,12 +1681,14 @@ real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *sampl
 	return ((real_t) mcr/(real_t)(samples->numVectors) * 100);	
 }
 
-real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples)
+real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples, int num_displays )
 {
-  int d_mcr = 0;
+  	int d_mcr = 0;
 	int sampleCtr = 0;
+	int displayed = 0;
 	for (sampleCtr = 0; sampleCtr < samples->numVectors; sampleCtr++)
 	{
+		
 		cnnlayer_t* current = headlayer;
 		cnnlayer_t* next_to_current = current->next;
 
@@ -1674,6 +1699,7 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 		int desired_label = samples->lables[sampleCtr];
 
 		int input_data_ctr = 0;
+	
 		for (input_data_ctr = 0; input_data_ctr < inp_vec_size; input_data_ctr++)
 		{
 			int inputIdx = sampleCtr * inp_vec_size + input_data_ctr;
@@ -1777,8 +1803,15 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 					}
 				}
 
-				if(desired_label != maxidx)
+				if(desired_label != maxidx) {
+					if (num_displays > 0 && displayed < num_displays) {
+						display_layer(headlayer);
+						fprintf(stderr, "\nGround Truth: %d", desired_label);
+						fprintf(stderr, "\nPredicted: %d\n\n", maxidx);
+						displayed += 1;
+					}
 					d_mcr++;
+				}
 			}
 		} 
 	} 

@@ -259,3 +259,27 @@ void display_dataVector(struct dataset* dataVector)
 		}
 	}
 }
+
+// void display_outputs(struct nnlayer *layer, int nouts, int batch_size, int *desired_output) {
+//     fprintf(stderr, "\n----------- Display Output ------------\n");
+    
+//     int batch_ctr;
+//     for (batch_ctr = 0; batch_ctr < batch_size; batch_ctr++) {
+//         fprintf(stderr, "[ ");
+//         for (int i = 0; i < nouts)
+//     }
+// }
+
+
+void display__layer(cnnlayer_t * current) {
+    fprintf(stderr, "\nCurrent Input: \n");
+    
+    int no_of_neurons = current->no_of_neurons;
+    for (int counter = 0; counter < no_of_neurons; counter++)
+    {
+        if (counter % current->fmap_width == 0)
+            printf("\n");
+        printf("\t%f", current->neurons_input[counter]);
+    }
+    
+}
