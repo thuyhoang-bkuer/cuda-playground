@@ -23,11 +23,10 @@ struct nnlayer
 	int no_of_neurons;
 	int fmap_width;
 	int fmap_height;
-	int fkernel;
-	int layer_type;
-	int pool_type;
+	int fkernel;			// Kernel size
+	int layer_type;			// activation (0 = None, 1 = sigmoid, 2 = tangent, 3 = reLU)
+	int pool_type;			// pooling (1 = average, 2 = max, 3 = stochastic)
 	int subsampling;
-	int	isclamped; 
 
 	/* Host (HOST CPU) Variables */
 	real_t* neurons_input;          // neurons input on host device
@@ -35,7 +34,7 @@ struct nnlayer
 	real_t* dy_output;              // derivative d/dx (output)
 	real_t* error_deltas;           // errors (an deltas) for each neuron
 	real_t* weights_matrix;         // weights matrix on host
-	real_t* delta_weights;   // weight updates
+	real_t* delta_weights;   		// weight updates
 	real_t* biases;
 	real_t* delta_biases;
 	int*	gradientMap;
@@ -44,9 +43,9 @@ struct nnlayer
 	real_t* d_neurons_output;       // for device, output = transfer function (input)
 	real_t* d_biases;
 	real_t* d_delta_biases;
-	real_t* d_error_deltas;           // errors (an deltas) for each neuron
-	real_t* d_weights;       // weights matrix on device (GPU) 
-	real_t* d_delta_weights;   // weight updates
+	real_t* d_error_deltas;         // errors (an deltas) for each neuron
+	real_t* d_weights;       		// weights matrix on device (GPU) 
+	real_t* d_delta_weights;   		// weight updates
 	int*	d_gradientMap;
 
 	struct nnlayer* next;           // points to next layer, null for last layer

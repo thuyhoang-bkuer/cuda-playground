@@ -143,17 +143,17 @@ int readTestFiles(struct dataset* test_samples)
 			int currlabel = bufferLables[labelCounterF];
          test_samples->lables[labelCounterD] = currlabel;
 
-         if (imgCounter % 10000 == 0) {
-            int row, col;
-            row = col = (int) sqrt(inputVectorSize);
-            fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) \n", imgCounter, row, col);
-            for (int i = 0; i < col; i ++) {
-               for (int j = 0; j < row; j++) {
-                  fprintf(stderr, "%2.1lf ", test_samples->data[imgCounter * inputVectorSize + i * col + j]);
-               }
-               fprintf(stderr, "\n");
-            }
-         }
+         // if (imgCounter % 10000 == 0) {
+         //    int row, col;
+         //    row = col = (int) sqrt(inputVectorSize);
+         //    fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) \n", imgCounter, row, col);
+         //    for (int i = 0; i < col; i ++) {
+         //       for (int j = 0; j < row; j++) {
+         //          fprintf(stderr, "%2.1lf ", test_samples->data[imgCounter * inputVectorSize + i * col + j]);
+         //       }
+         //       fprintf(stderr, "\n");
+         //    }
+         // }
 
 #ifdef __freadDebug
          fprintf(stderr, "\n labelcounter(d,f): %d, %d, Train60kLables: %d", labelCounterD, labelCounterF, Test10kLables[labelCounterD]);
@@ -268,17 +268,17 @@ int readTrainingFiles(struct dataset* train_samples)
 			int currlabel = bufferLables[labelCounterF];
 			train_samples->lables[labelCounterD] = currlabel;
 
-         if (imgCounter % 10000 == 0) {
-            int row, col;
-            row = col = (int) sqrt(inputVectorSize);
-            fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) - label %d \n", imgCounter, row, col, currlabel);
-            for (int i = 0; i < col; i ++) {
-               fprintf(stderr, "\n");
-               for (int j = 0; j < row; j++) {
-                  fprintf(stderr, "%2.1lf ", train_samples->data[imgCounter * inputVectorSize + i * col + j]);
-               }
-            }
-         }
+         // if (imgCounter % 10000 == 0) {
+         //    int row, col;
+         //    row = col = (int) sqrt(inputVectorSize);
+         //    fprintf(stderr, "\n Image no.%d on memory (row, col) = (%d, %d) - label %d \n", imgCounter, row, col, currlabel);
+         //    for (int i = 0; i < col; i ++) {
+         //       fprintf(stderr, "\n");
+         //       for (int j = 0; j < row; j++) {
+         //          fprintf(stderr, "%2.1lf ", train_samples->data[imgCounter * inputVectorSize + i * col + j]);
+         //       }
+         //    }
+         // }
 
 #ifdef __freadDebug
 			fprintf(stderr, "\n labelcounter(d,f): %d, %d, Train60kLables: %d", labelCounterD, labelCounterF, Train60kLables[labelCounterD]);

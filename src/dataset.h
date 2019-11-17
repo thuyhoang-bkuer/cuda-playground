@@ -13,11 +13,11 @@ typedef struct dataset dataset_t;
 
 struct dataset
 {
-	int numVectors;
-	int lenVector;
-	double* data;	
-	unsigned char* lables;	
-	int lenlable;	
+	int             numVectors;
+	int             lenVector;
+	double*         data;	
+	unsigned char*  lables;	
+	int             lenlable;	
 };
 
 #ifdef __cplusplus

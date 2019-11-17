@@ -1718,7 +1718,7 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 
 			int src_fmaps = current->no_of_fmaps;
 			int dst_fmaps = next_to_current->no_of_fmaps;
-			int fkernel = current->fkernel;
+			int fkernel = current->fkernel;				// Kernel size
 			int bmargin = floor(fkernel/2);
 			int imh = current->fmap_height;
 			int imw = current->fmap_width;
@@ -1732,8 +1732,8 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
                 real_t* d_kernel = current->d_weights;
                 real_t* d_biases = current->d_biases;
                
-                dim3 nBlocks(src_fmaps, dst_fmaps, 1); 
-                dim3 nThreads(imw, imh, 1); 
+                dim3 nBlocks(src_fmaps, dst_fmaps, 1); 		// Grid-dimension -> (src_fmaps * dst_fmaps) blocks
+                dim3 nThreads(imw, imh, 1); 				// Block-dimension -> (imw * imh) threads/block
                 
                 int sh_mem_size = imw * imh * sizeof(real_t) + fkernel * fkernel * sizeof(real_t);
                 convolve_device_2D<<<nBlocks, nThreads, sh_mem_size>>>(d_output, d_input, d_kernel, fkernel * fkernel);

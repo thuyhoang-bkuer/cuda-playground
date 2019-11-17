@@ -18,10 +18,13 @@ __global__ void compute_transfer_function(real_t* d_output, real_t* d_biases, in
 
 __global__ void convolve_device_2D(real_t* d_output, real_t* d_input, real_t* d_kernel, int kerSize)
 {
+    /*
+     * Each thread compute a value of output
+     */
     int inpfmapSize = blockDim.x * blockDim.y;
     int inprSize = (int) sqrt((float)inpfmapSize);    
     int inpcSize = inprSize; 
-    int kerrSize = (int) sqrt((float)kerSize);    
+    int kerrSize = (int) sqrt((float)kerSize);    // kerSize = row * col
     int kercSize = kerrSize; 
     int outrSize = inprSize - 2 * (kerrSize/2);
 
@@ -30,9 +33,9 @@ __global__ void convolve_device_2D(real_t* d_output, real_t* d_input, real_t* d_
     real_t* sh_kernel = &sh_mem[inpfmapSize];
     
     //1. copy input from global memory to shared memory
-    int cinpThreadIdx = threadIdx.y * blockDim.x + threadIdx.x;
-    int inpThreadIdx = blockIdx.x * (blockDim.x * blockDim.y) + cinpThreadIdx; //(0, 1) * (32 * 32) 
-    sh_input[cinpThreadIdx] = d_input[inpThreadIdx];
+    int cinpThreadIdx = threadIdx.y * blockDim.x + threadIdx.x;     // current Thread Index
+    int inpThreadIdx = blockIdx.x * (blockDim.x * blockDim.y) + cinpThreadIdx; //Data in global corresponse to current thread
+    sh_input[cinpThreadIdx] = d_input[inpThreadIdx];        // 1 value per thread
 
     //2. copy kernel from global memory to shared memory (only 5x5 per thread block)
     int currBlockstIdx = (blockIdx.y * gridDim.x + blockIdx.x) * kerSize;
@@ -54,9 +57,9 @@ __global__ void convolve_device_2D(real_t* d_output, real_t* d_input, real_t* d_
             int kr = 0, kc = 0, kCtr = 0;
             real_t sum = 0.0;
 
-            for (kr = -kerrSize/2; kr <= kerrSize/2; kr++)
+            for (kr = -kerrSize/2; kr <= kerrSize/2; kr++)      // kr: kernel row
             {
-                for (kc = -kercSize/2; kc <= kercSize/2; kc++)
+                for (kc = -kercSize/2; kc <= kercSize/2; kc++)      // kc: kernel col
                 {
                     sum += sh_input[cinpThreadIdx + kr * inprSize + kc] * sh_kernel[kCtr];
                     kCtr++; 

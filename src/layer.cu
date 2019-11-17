@@ -94,7 +94,6 @@ cnnlayer_t* create_cnn(cnn_t* cnn_specs)
 		current->d_biases = NULL;
 		current->delta_biases = NULL;
 		current->d_delta_biases = NULL;
-		current->isclamped = false;		
 
 		if (counter == 0)
 		{
