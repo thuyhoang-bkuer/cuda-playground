@@ -562,14 +562,14 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 
 		mini_batching(batch_indexes, nvecs, false); 
 
-				real_t avg_mse = 0;
+		real_t avg_mse = 0;
         int nouts = train_samples->lenlable;			
 
         if (gpu_turn != 0)
         {
             GpuTimer timer;
             long double elapsed = 0.0;
-            int bctr = 0;
+            int bctr = 0;		// counter in a batch
             for (bctr = 0; bctr < batch_count; bctr++)
             {
                 timer.Start();
@@ -582,14 +582,14 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 elapsed += time_citer;
             
                 if (bctr % 1000 == 0) {
-										fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter, max_epoch);
-										
-										avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
-										fprintf(stderr,"\n Avg MSE: %f", avg_mse);
-								}
-						}
+					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter, max_epoch);
+					
+					avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
+					fprintf(stderr,"\n Avg MSE: %f", avg_mse);
+				}
+			}
 						
-						// avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
+			avg_mse = compute_mse(headlayer, nouts, batch_indexes, train_samples->lables) ;
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
         }
         else 
@@ -610,7 +610,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 elapsed += time_citer;
 
                 if (bctr % 100 == 0)
-										fprintf(stderr,"\nbctr/batch_count: %d/%d/%d", bctr, batch_count, max_epoch);
+					fprintf(stderr,"\nbctr/batch_count: %d/%d/%d", bctr, batch_count, max_epoch);
 										
             }
 
@@ -642,8 +642,8 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 sprintf (fn, "%d", epoch_counter);
                 strcat(fname, fn);
                 save_trained_network_weights(headlayer, fname);
-								min_mcr = mcr_test_set;
-								fprintf(stderr,"\t\tWriting weights done!\n\n");
+				min_mcr = mcr_test_set;
+				fprintf(stderr,"\t\tWriting weights done!\n\n");
             }
         }
         else if (gpu_turn == 0 && epoch_counter % nMcr == 0)

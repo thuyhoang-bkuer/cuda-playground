@@ -1,7 +1,7 @@
 #ifndef __BATCH_H__
 #define __BATCH_H__
 
-#define BATCH_SIZE 1
+#define BATCH_SIZE 24
 
 #ifdef __cplusplus
 extern "C"
