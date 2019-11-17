@@ -278,8 +278,8 @@ void display_layer(cnnlayer_t * current) {
     for (int counter = 0; counter < no_of_neurons; counter++)
     {
         if (counter % current->fmap_width == 0)
-            printf("\n");
-        printf("\t%f", current->neurons_input[counter]);
+            fprintf(stderr, "\n");
+        fprintf(stderr, "%2.1lf ",  current->neurons_input[counter]);
     }
     
 }
