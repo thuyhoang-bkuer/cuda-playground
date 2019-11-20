@@ -53,33 +53,72 @@ int main(int argc, char *argv[])
 	 * 	2 - tanh
 	 * 	3 - relu
 	*/
+	// cnn_specs->act_maps = (int *) calloc(cnn_specs->nlayers, sizeof(int));
+	// cnn_specs->act_maps[2] = 3;		// relu
+	// cnn_specs->act_maps[4] = 3;		// relu
+	// cnn_specs->act_maps[5] = 2;		// relu
+	// cnn_specs->act_maps[6] = 2;		// relu
+	// cnn_specs->act_maps[7] = 1;		// relu
+
+	// cnn_specs->no_fmaps = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
+	// cnn_specs->no_fmaps[0] = 1;			//input
+	// cnn_specs->no_fmaps[1] = 16;		//Conv-ReLU 1
+	// cnn_specs->no_fmaps[2] = 16;		//Subsample 2
+	// cnn_specs->no_fmaps[3] = 24;   	//Conv-ReLU 3
+	// cnn_specs->no_fmaps[4] = 24; 		//Subsample 4
+	// cnn_specs->no_fmaps[5] = 48;  	//Flatten
+	// cnn_specs->no_fmaps[6] = 128; 	//
+	// cnn_specs->no_fmaps[7] = 10; 		//final
+
+	// cnn_specs->fmap_size = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
+
+	// cnn_specs->fmap_size[0] = 1024;	//32 x 32 x 1
+	// cnn_specs->fmap_size[1] = 784;	//28 x 28 
+	// cnn_specs->fmap_size[2] = 196; 	//14 x 14 
+	// cnn_specs->fmap_size[3] = 100; 	//10 x 10 
+	// cnn_specs->fmap_size[4] = 25; 	// 5 x  5 x 24
+	// cnn_specs->fmap_size[5] = 1; 	// 1 x  1 x 48
+	// cnn_specs->fmap_size[6] = 1; 	// 1 x  1 x 128
+	// cnn_specs->fmap_size[7] = 1; 	// 1 x  1 x 10
+
+	// cnn_specs->fkernel = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
+	// cnn_specs->fkernel[0] = 5;
+	// cnn_specs->fkernel[1] = 1;
+	// cnn_specs->fkernel[2] = 5;
+	// cnn_specs->fkernel[3] = 1;
+	// cnn_specs->fkernel[4] = 5;
+	// cnn_specs->fkernel[5] = 1;
+	// cnn_specs->fkernel[6] = 1;
+	// cnn_specs->fkernel[7] = 1;
+
+
 	cnn_specs->act_maps = (int *) calloc(cnn_specs->nlayers, sizeof(int));
 	cnn_specs->act_maps[2] = 3;		// relu
 	cnn_specs->act_maps[4] = 3;		// relu
-	cnn_specs->act_maps[5] = 2;		// relu
-	cnn_specs->act_maps[6] = 2;		// relu
-	cnn_specs->act_maps[7] = 1;		// relu
+	cnn_specs->act_maps[5] = 2;		// tanh
+	cnn_specs->act_maps[6] = 2;		// tanh
+	cnn_specs->act_maps[7] = 1;		// sigmoid
 
 	cnn_specs->no_fmaps = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
 	cnn_specs->no_fmaps[0] = 1;			//input
-	cnn_specs->no_fmaps[1] = 16;		//Conv-ReLU 1
-	cnn_specs->no_fmaps[2] = 16;		//Subsample 2
-	cnn_specs->no_fmaps[3] = 24;   	//Conv-ReLU 3
-	cnn_specs->no_fmaps[4] = 24; 		//Subsample 4
-	cnn_specs->no_fmaps[5] = 48;  	//Flatten
-	cnn_specs->no_fmaps[6] = 128; 	//
+	cnn_specs->no_fmaps[1] = 6;			//Conv-ReLU 1
+	cnn_specs->no_fmaps[2] = 6;			//Subsample 2
+	cnn_specs->no_fmaps[3] = 10;   		//Conv-ReLU 3
+	cnn_specs->no_fmaps[4] = 10; 		//Subsample 4
+	cnn_specs->no_fmaps[5] = 120;  		//Flatten
+	cnn_specs->no_fmaps[6] = 84; 		// Fc
 	cnn_specs->no_fmaps[7] = 10; 		//final
 
 	cnn_specs->fmap_size = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
 
 	cnn_specs->fmap_size[0] = 1024;	//32 x 32 x 1
-	cnn_specs->fmap_size[1] = 784;	//28 x 28 x 16
-	cnn_specs->fmap_size[2] = 196; 	//14 x 14 x 16
-	cnn_specs->fmap_size[3] = 100; 	//10 x 10 x 24
+	cnn_specs->fmap_size[1] = 784;	//28 x 28 
+	cnn_specs->fmap_size[2] = 196; 	//14 x 14 
+	cnn_specs->fmap_size[3] = 100; 	//10 x 10 
 	cnn_specs->fmap_size[4] = 25; 	// 5 x  5 x 24
-	cnn_specs->fmap_size[5] = 1; 	 	// 1 x  1 x 48
-	cnn_specs->fmap_size[6] = 1; 		// 1 x  1 x 128
-	cnn_specs->fmap_size[7] = 1; 		// 1 x  1 x 10
+	cnn_specs->fmap_size[5] = 1; 	// 1 x  1 x 48
+	cnn_specs->fmap_size[6] = 1; 	// 1 x  1 x 128
+	cnn_specs->fmap_size[7] = 1; 	// 1 x  1 x 10
 
 	cnn_specs->fkernel = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
 	cnn_specs->fkernel[0] = 5;
@@ -119,13 +158,13 @@ int main(int argc, char *argv[])
 	
 	#if 1
 	double mcr = 0;	
-	printf("\n Computing Missclassification Rate on Test Set");
+	// printf("\n Computing Missclassification Rate on Test Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Test Set");
 	mcr = d_compute_missclassification_rate(headlayer, test_samples, 3);	
 	// printf("\n missclassification rate is : %6.3f\n", mcr);
 	fprintf(stderr,"\n missclassification rate is : %6.3f\n", mcr);
 
-	printf("\n Computing Missclassification Rate on Training Set");
+	// printf("\n Computing Missclassification Rate on Training Set");
 	fprintf(stderr,"\n Computing Missclassification Rate on Training Set");
 	mcr = d_compute_missclassification_rate(headlayer, train_samples, 0);	
 	fprintf(stderr,"\n missclassification rate on training is : %6.3f\n", mcr);
