@@ -491,6 +491,10 @@ real_t stochastic_pooling(real_t a01, real_t a02, real_t a03, real_t a04, int* p
 
 real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, unsigned char* lables) 
 {
+	/*
+	 * 
+	 *
+	 */
 	struct nnlayer* current = headlayer;
 	struct nnlayer* lastlayer = NULL;
 
@@ -576,11 +580,11 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 
 	while (epoch_counter < max_epoch)
 	{
-    int nMcr = 1;
+    	int nMcr = 1;
 		int nvecs = train_samples->numVectors;
-		int batch_count = nvecs/BATCH_SIZE;
+		int batch_count = nvecs/BATCH_SIZE/60;
 
-		mini_batching(batch_indexes, nvecs, false); 
+		mini_batching(batch_indexes, nvecs, true); 
 
 		real_t avg_mse = 0;
 		int nouts = train_samples->lenlable;
@@ -602,13 +606,16 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 timer.Stop();
                 float time_citer = timer.Elapsed();
 				elapsed += time_citer;
-				
-				avg_mse += compute_mse(headlayer, nouts, &batch_indexes[bctr * BATCH_SIZE], train_samples->lables);
-            
-                if (bctr % 1000 == 0) {
-					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", bctr, batch_count, epoch_counter + 1, max_epoch);
-					
 
+				float mse = compute_mse(headlayer, nouts, &batch_indexes[bctr * BATCH_SIZE], train_samples->lables);
+				
+				avg_mse += mse;
+            
+                if (bctr % 1000 == 999) {
+					// Compute mean-square error after 1000 training
+					
+					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d  MSE: %.5f.", bctr + 1, batch_count, epoch_counter + 1, max_epoch, mse);
+					
 				}
 			}
 						
@@ -630,17 +637,19 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 reset_inputs_dweights_deltas(headlayer);
                 long end_ticks = getticks();
                 float time_citer = (float)(end_ticks - start_ticks)/3330000;
-                elapsed += time_citer;
+				elapsed += time_citer;
+				float mse = compute_mse(headlayer, nouts, &batch_indexes[bctr * BATCH_SIZE], train_samples->lables);
+				avg_mse += mse;
 
                 if (bctr % 100 == 0)
-					fprintf(stderr,"\nbctr/batch_count: %d/%d/%d", bctr, batch_count, max_epoch);
+					fprintf(stderr,"\nbctr/batch_count: %d/%d/%d  MSE: %.5f", bctr, batch_count, max_epoch, mse);
 										
             }
 
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
-        }
+		}
 
-        avg_mse = avg_mse/batch_count;
+		avg_mse = avg_mse / batch_count;
         printf("\n Avg MSE: %f, epoch: %d", avg_mse, epoch_counter);
         
         if (gpu_turn != 0 && epoch_counter % nMcr == 0)
@@ -652,7 +661,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples, 3);
             printf("\n =========================");
             printf("\n EpochCounter\t\tTEST SET");
-            printf("\n\n%6d\t\t\t%4.3f", epoch_counter, mcr_test_set);
+            printf("\n\n%6d\t\t\t%4.3f", epoch_counter + 1, mcr_test_set);
             printf("\n");
 
             d_reset_output_vectors(headlayer);
@@ -671,13 +680,13 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
         }
         else if (gpu_turn == 0 && epoch_counter % nMcr == 0)
         {
-            //display_weights_matrices(headlayer);
+			//display_weights_matrices(headlayer);
             real_t mcr_test_set = 0;
             mcr_test_set = h_compute_missclassification_rate(headlayer, test_samples);
             printf("\n =========================");
             printf("\n EpochCounter     TEST SET");
-            printf("\n\n   %d              %f   ", epoch_counter, mcr_test_set);
-            fprintf(stderr,"\n\n   %d              %f   ", epoch_counter, mcr_test_set);
+            printf("\n\n   %d              %f   ", epoch_counter + 1, mcr_test_set);
+
             printf("\n");
 
             reset_inputs_dweights_deltas(headlayer);
@@ -685,7 +694,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             if (mcr_test_set < min_mcr)
             {
                 char fn[4];
-                char fname[13] = "WEIGHTS/";
+                char fname[13] = "Checkpoint-";
                 sprintf (fn, "%d", epoch_counter);
                 strcat(fname, fn);
                 save_trained_network_weights(headlayer, fname);
@@ -1487,7 +1496,7 @@ real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *sampl
  
 						real_t* filter = NULL;
 
-            filter = &(current->weights_matrix[st_idx]); 
+            			filter = &(current->weights_matrix[st_idx]); 
 
 						int fmap_stidx = sctr * imh * imw;
 

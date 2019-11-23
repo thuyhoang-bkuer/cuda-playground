@@ -93,11 +93,14 @@ int main(int argc, char *argv[])
 
 
 	cnn_specs->act_maps = (int *) calloc(cnn_specs->nlayers, sizeof(int));
+	cnn_specs->act_maps[0] = 3;
+	cnn_specs->act_maps[1] = 3;
 	cnn_specs->act_maps[2] = 3;		// relu
+	cnn_specs->act_maps[3] = 3;
 	cnn_specs->act_maps[4] = 3;		// relu
-	cnn_specs->act_maps[5] = 2;		// tanh
-	cnn_specs->act_maps[6] = 2;		// tanh
-	cnn_specs->act_maps[7] = 1;		// sigmoid
+	cnn_specs->act_maps[5] = 3;		// sigmoid
+	cnn_specs->act_maps[6] = 3;		// sigmoid
+	cnn_specs->act_maps[7] = 3;		// sigmoid
 
 	cnn_specs->no_fmaps = (int *) malloc(sizeof(int) * cnn_specs->nlayers);
 	cnn_specs->no_fmaps[0] = 1;			//input
