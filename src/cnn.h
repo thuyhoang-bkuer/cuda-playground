@@ -35,7 +35,7 @@ void d_compute_gradients_deltas(struct nnlayer *headlayer, int nouts,  unsigned 
 void d_reset_vectors(struct nnlayer* current);
 void d_reset_output_vectors(cnnlayer_t* headlayer);
 void d_update_weights(struct nnlayer* current);
-real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples, int num_display);
+real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples);
 
 real_t dreLUSoftPlus(real_t x);
 real_t dhtangent(real_t x);

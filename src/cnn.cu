@@ -14,6 +14,23 @@
 
 double	LEARNING_RATE = 0.003;
 
+void writeMetrics(float time, float mse, float mcr) 
+{
+	char filename[15] = "Metrics";
+	FILE *fp = fopen(filename, "a");
+	if (fp == NULL) {
+		fprintf(stderr, "Cant open file!\n");
+		return;
+	}
+ 	fprintf(fp, "%2.6f ", time);
+	fprintf(fp, "%2.6f ", mse);
+	fprintf(fp, "%2.6f ", mcr);
+	fprintf(fp, "\n");
+	fprintf(stderr, "Writing metrics.. Done\n");
+	fclose(fp);
+}
+
+
 //1. handle subsampling layer weights and biases
 //                
 int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_indexes)
@@ -57,10 +74,6 @@ int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_inde
 
 			if (next_to_current->subsampling == false && current->fkernel != 1)
 			{
-								//convolution layers
-                //int kerSize = src_fmaps * dst_fmaps * fkernel * fkernel;
-                //int kerBytes = kerSize * sizeof(real_t);
-                //HANDLE_ERROR(cudaMemcpy(current->d_weights, current->weights_matrix, kerBytes, cudaMemcpyHostToDevice));
 
                 real_t* d_output = next_to_current->d_neurons_output;
                 real_t* d_input = current->d_neurons_output;
@@ -74,18 +87,12 @@ int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_inde
                 convolve_device_2D<<<nBlocks, nThreads, sh_mem_size>>>(d_output, d_input, d_kernel, fkernel * fkernel);
                 compute_transfer_function<<<dst_fmaps, next_imw * next_imh >>>(d_output, d_biases, current->layer_type);
                 cudaDeviceSynchronize();
-
-                //int noutSize = (next_imw * next_imh * dst_fmaps) * sizeof(real_t);
-                //HANDLE_ERROR(cudaMemcpy(next_to_current->neurons_output, d_output, noutSize, cudaMemcpyDeviceToHost));
 			}
 			else if (next_to_current->subsampling == false && current->fkernel == 1)
 			{
 				// fully-connected layer
 			   	int src_layer_size = current->no_of_neurons;
 				int dst_layer_size = next_to_current->no_of_neurons;
-
-                //int weights_size = src_layer_size * dst_layer_size * sizeof(real_t);
-                //HANDLE_ERROR(cudaMemcpy(current->d_weights, current->weights_matrix, weights_size, cudaMemcpyHostToDevice));
 
                 real_t* d_input = current->d_neurons_output;
                 real_t* d_output = next_to_current->d_neurons_output;
@@ -99,9 +106,6 @@ int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_inde
                 d_rear_DNN<<<nBlocks, nThreads, sh_mem_size>>>(d_output, d_input, d_weights);
                 compute_transfer_function<<< dst_layer_size, 1 >>>(d_output, d_biases, current->layer_type);
                 cudaDeviceSynchronize();
-
-                //int noutSize = dst_layer_size * sizeof(real_t);
-                //HANDLE_ERROR(cudaMemcpy(next_to_current->neurons_output, d_output, noutSize, cudaMemcpyDeviceToHost));
 			}
 			else if (next_to_current->subsampling == true)
 			{
@@ -122,10 +126,6 @@ int d_feed_forward(cnnlayer_t *headlayer, double *training_data, int *batch_inde
                 int sh_mem_size = imw * imh * sizeof(real_t);
                 d_subsampling<<<nBlocks, nThreads, sh_mem_size>>>(d_output, d_input, d_gradientMap, current->layer_type);
                 cudaDeviceSynchronize();
-                
-                //int noutSize = (next_imw * next_imh * dst_fmaps) * sizeof(real_t);
-                //HANDLE_ERROR(cudaMemcpy(next_to_current->neurons_output, d_output, noutSize, cudaMemcpyDeviceToHost));
-                //HANDLE_ERROR(cudaMemcpy(next_to_current->gradientMap, d_gradientMap, noutSize, cudaMemcpyDeviceToHost));
 			}
 	
 			if (flag == true)
@@ -491,10 +491,6 @@ real_t stochastic_pooling(real_t a01, real_t a02, real_t a03, real_t a04, int* p
 
 real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, unsigned char* lables) 
 {
-	/*
-	 * 
-	 *
-	 */
 	struct nnlayer* current = headlayer;
 	struct nnlayer* lastlayer = NULL;
 
@@ -539,17 +535,6 @@ real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, uns
 			mse = mse + (error * error); 
 		}
 
-		// Print output
-		// fprintf(stderr, "\n------- MSE (%d) ------\n", cl);
-	
-		// fprintf(stderr, "[ ");
-		// for (int i = 0; i < nouts; i++) {
-		// 	if (i == cl) fprintf(stderr, "*");
-		// 	fprintf(stderr, "%.5f ", current->neurons_output[counter * nouts + i]);
-		// }
-		// fprintf(stderr, "]\n");
-
-
 		mse = mse/nouts;
 		avg_mse = avg_mse + mse;
 	}
@@ -563,7 +548,7 @@ real_t compute_mse(struct nnlayer* headlayer, int nouts, int* batch_indexes, uns
 void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_samples)
 {
 	int epoch_counter = 0;
-	int max_epoch = MAX_EPOCH;
+	int max_epoch = 50;
 	int *batch_indexes = (int *) malloc(sizeof(int) * train_samples->numVectors);
 	real_t min_mcr = 25.0;
 
@@ -571,7 +556,7 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 	copy_hweights_to_dweights(headlayer);
 	
 	real_t mcr_test_set = 0;
-	mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples, 2);
+	mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
 	printf("\n ===== BEFORE TRAINING ====");
 	printf("\n EpochCounter\t\tTEST SET");
 	printf("\n\n%6d\t\t\t%4.3f", epoch_counter, mcr_test_set);
@@ -582,13 +567,15 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 	{
     	int nMcr = 1;
 		int nvecs = train_samples->numVectors;
-		int batch_count = nvecs/BATCH_SIZE/60;
+		int batch_count = nvecs/BATCH_SIZE;
 
 		mini_batching(batch_indexes, nvecs, true); 
 
 		real_t avg_mse = 0;
 		int nouts = train_samples->lenlable;
 		
+		long double time = 0.0;
+		real_t mcr = 0.0;
 		
 
         if (gpu_turn != 0)
@@ -612,14 +599,13 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 				avg_mse += mse;
             
                 if (bctr % 1000 == 999) {
-					// Compute mean-square error after 1000 training
-					
-					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d  MSE: %.5f.", bctr + 1, batch_count, epoch_counter + 1, max_epoch, mse);
-					
+					fprintf(stderr,"\nbctr/batch_count: %d/%d  epoch_counter/max_epoch: %d/%d", 
+							bctr + 1, batch_count, 
+							epoch_counter + 1, max_epoch);	
 				}
 			}
 						
-			
+			time = elapsed;
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
         }
         else 
@@ -641,16 +627,17 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
 				float mse = compute_mse(headlayer, nouts, &batch_indexes[bctr * BATCH_SIZE], train_samples->lables);
 				avg_mse += mse;
 
-                if (bctr % 100 == 0)
-					fprintf(stderr,"\nbctr/batch_count: %d/%d/%d  MSE: %.5f", bctr, batch_count, max_epoch, mse);
+                if (bctr % 1000 == 999)
+					fprintf(stderr,"\nbctr/batch_count: %d/%d/%d  MSE: %.5f", bctr + 1, batch_count, max_epoch, mse);
 										
             }
-
+			time = elapsed;
             fprintf(stderr, "\n elapsed_time: %Lf", elapsed);	
 		}
 
 		avg_mse = avg_mse / batch_count;
-        printf("\n Avg MSE: %f, epoch: %d", avg_mse, epoch_counter);
+		printf("\n Avg MSE: %f, epoch: %d", avg_mse, epoch_counter);
+		
         
         if (gpu_turn != 0 && epoch_counter % nMcr == 0)
         {
@@ -658,12 +645,13 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             //display_weights_matrices(headlayer);
 
             real_t mcr_test_set = 0;
-            mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples, 3);
+            mcr_test_set = d_compute_missclassification_rate(headlayer, test_samples);
             printf("\n =========================");
             printf("\n EpochCounter\t\tTEST SET");
             printf("\n\n%6d\t\t\t%4.3f", epoch_counter + 1, mcr_test_set);
             printf("\n");
 
+			mcr = mcr_test_set;
             d_reset_output_vectors(headlayer);
 
             if (mcr_test_set < min_mcr)
@@ -688,8 +676,8 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
             printf("\n\n   %d              %f   ", epoch_counter + 1, mcr_test_set);
 
             printf("\n");
-
-            reset_inputs_dweights_deltas(headlayer);
+			mcr = mcr_test_set;
+			reset_inputs_dweights_deltas(headlayer);
 
             if (mcr_test_set < min_mcr)
             {
@@ -700,9 +688,10 @@ void train_cnn(cnnlayer_t* headlayer, dataset_t* train_samples, dataset_t* test_
                 save_trained_network_weights(headlayer, fname);
                 min_mcr = mcr_test_set;
             }
-        }
+		}
+		writeMetrics(time, avg_mse, mcr);
 
-        if (epoch_counter % 2 == 0)
+        if (epoch_counter % 5 == 0)
             LEARNING_RATE = LEARNING_RATE * 0.93;
 
         epoch_counter++;
@@ -1690,11 +1679,11 @@ real_t h_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t *sampl
 	return ((real_t) mcr/(real_t)(samples->numVectors) * 100);	
 }
 
-real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples, int num_displays )
+real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* samples)
 {
   	int d_mcr = 0;
 	int sampleCtr = 0;
-	int displayed = 0;
+	int corr = 0; int miss = 0;
 	for (sampleCtr = 0; sampleCtr < samples->numVectors; sampleCtr++)
 	{
 		
@@ -1813,13 +1802,21 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 				}
 
 				if(desired_label != maxidx) {
-					if (num_displays > 0 && displayed < num_displays) {
+					if (miss < 1) {
 						display_layer(headlayer);
 						fprintf(stderr, "\nGround Truth: %d", desired_label);
 						fprintf(stderr, "\nPredicted: %d\n\n", maxidx);
-						displayed += 1;
+						miss += 1;
 					}
 					d_mcr++;
+				}
+				else {
+					if (corr < 1) {
+						display_layer(headlayer);
+						fprintf(stderr, "\nGround Truth: %d", desired_label);
+						fprintf(stderr, "\nPredicted: %d\n\n", maxidx);
+						corr += 1;
+					}
 				}
 			}
 		} 
@@ -1827,3 +1824,5 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 
 	return ((real_t) d_mcr/(real_t)(samples->numVectors) * 100);	
 }
+
+

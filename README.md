@@ -8,3 +8,7 @@ Convolutional Neural Network (CNN) Simulator
 5- make
 6- conv_gpu.out is the executable
 7- The dataset can be input via readMNISTDB.c file (provide approriate path)
+
+
+
+
