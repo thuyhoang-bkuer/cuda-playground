@@ -1,14 +1,9 @@
-# CNN-in-C-and-CUDA
-Convolutional Neural Network (CNN) Simulator
+# Parallel Computing HCMUT 191
+- Student: Hoang Vu Trong Thuy.
+- Last Modified: Dec 1st, 2019.
 
-1- create a folder called CNN
-2- copy all the files to this folder
-3- move *.h and *.c to src/
-4- make clean 
-5- make
-6- conv_gpu.out is the executable
-7- The dataset can be input via readMNISTDB.c file (provide approriate path)
+# Usage
 
-
-
-
+- If MNIST is not available `. ./MNIST/get_mnist.sh`
+- Run `make` to create object and executable file
+- Run `./conv_gpu.out`

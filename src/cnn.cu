@@ -1683,7 +1683,7 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 {
   	int d_mcr = 0;
 	int sampleCtr = 0;
-	int corr = 0; int miss = 0;
+	int corr = (float)rand() / (float)RAND_MAX * 1000; int miss = (float)rand() / (float)RAND_MAX * 100;
 	for (sampleCtr = 0; sampleCtr < samples->numVectors; sampleCtr++)
 	{
 		
@@ -1802,21 +1802,25 @@ real_t d_compute_missclassification_rate(cnnlayer_t *headlayer, dataset_t* sampl
 				}
 
 				if(desired_label != maxidx) {
-					if (miss < 1) {
+					if (miss == 1) {
 						display_layer(headlayer);
 						fprintf(stderr, "\nGround Truth: %d", desired_label);
 						fprintf(stderr, "\nPredicted: %d\n\n", maxidx);
-						miss += 1;
+						
 					}
+
+					miss--;
 					d_mcr++;
 				}
 				else {
-					if (corr < 1) {
+					if (corr == 1) {
 						display_layer(headlayer);
 						fprintf(stderr, "\nGround Truth: %d", desired_label);
 						fprintf(stderr, "\nPredicted: %d\n\n", maxidx);
-						corr += 1;
+						
 					}
+
+					corr--;
 				}
 			}
 		} 

@@ -7,11 +7,6 @@ FLAG_DNN_OMP=0
 
 CUDA_PATH=/usr/local/cuda
 
-### these flags can be modified
-#OPTFLAG =-g
-#OPTFLAG =-O3 -funroll-loops -ftree-vectorize -msse4 -ftree-vectorizer-verbose=1
-#OPTFLAG =-O3 -funroll-loops
-#OPTFLAG=-m64 -Ofast -flto -march=native -funroll-loops
 OPTFLAG=-m64 -march=native -funroll-loops
 CFLAGS= -lm
 
